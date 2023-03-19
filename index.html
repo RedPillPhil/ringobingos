@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My NFT Collection</title>
+    <style>
+      /* CSS code for styling the page */
+      body {
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        text-align: center;
+        margin-top: 50px;
+      }
+      .nft-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 50px;
+      }
+      .nft {
+        width: 200px;
+        height: 200px;
+        margin: 10px;
+        background-color: #f2f2f2;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .nft img {
+        width: 80%;
+        height: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>My NFT Collection</h1>
+    <div class="nft-container"></div>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script>
+      // JS code for connecting to the blockchain and fetching NFTs
+      window.addEventListener("load", async () => {
+        if (window.ethereum) {
+          await window.ethereum.enable();
+          const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+          const signer = provider.getSigner();
+          const contractAddress = "0x3aC22795304A27edb04Cfe2475DCEf0c5C8B5539";
+          const abi = [
+            // Your smart contract ABI here
+          ];
+          const contract = new ethers.Contract(contractAddress, abi, signer);
+          const nftContainer = document.querySelector(".nft-container");
+          const totalSupply = await contract.totalSupply();
+          for (let i = 0; i < totalSupply; i++) {
+            const tokenId = await contract.tokenByIndex(i);
+            const tokenURI = await contract.tokenURI(tokenId);
+            const metadataResponse = await fetch(tokenURI);
+            const metadata = await metadataResponse.json();
+            const nftDiv = document.createElement("div");
+            nftDiv.className = "nft";
+            const nftImage = document.createElement("img");
+            nftImage.src = metadata.image;
+            const nftName = document.createElement("p");
+            nftName.textContent = metadata.name;
+            nftDiv.appendChild(nftImage);
+            nftDiv.appendChild(nftName);
+            nftContainer.appendChild(nftDiv);
+          }
+        } else {
+          console.log("Metamask not detected");
+        }
+      });
+    </script>
+  </body>
+</html>
